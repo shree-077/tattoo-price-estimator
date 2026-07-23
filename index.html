@@ -1,0 +1,121 @@
+
+<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dayara Tattoo Price Estimator</title>
+<style>
+body{font-family:Arial,sans-serif;background:#fff;color:#222;margin:0;padding:18px}
+.wrap{max-width:520px;margin:auto;border:1px solid #ddd;border-radius:14px;padding:18px}
+h2{text-align:center;margin:0 0 6px}p{color:#666;font-size:14px}
+label{font-weight:bold}input[type=range]{width:100%}
+.card{background:#f7f7f7;border-radius:10px;padding:15px;margin-top:15px}
+.big{font-size:30px;font-weight:700}
+.offer label{display:block;margin:6px 0;font-weight:normal}
+a.btn{display:block;text-align:center;background:#111;color:#fff;text-decoration:none;padding:12px;border-radius:8px;margin-top:14px}
+.small{font-size:12px;color:#666}
+</style></head><body>
+<div class="wrap">
+<h2>Dayara Tattoo Price Estimator</h2>
+<p>Estimate based on tattoo size. Final pricing depends on artwork, placement and complexity.</p>
+
+<label>Width: <span id=wvs>4</span>"</label>
+<input id=w type=range min=1 max=8 step=.5 value=4>
+
+<label>Height: <span id=hvs>3</span>"</label>
+<input id=h type=range min=1 max=8 step=.5 value=3>
+
+<div class=card>
+<div>Area</div>
+<div class=big><span id=area>12</span> sq in</div>
+<div style="margin-top:10px">Your tattoo will cost approximately</div>
+<div class=big id=price>₹6,000</div>
+<div id=compare style="margin:10px 0"></div>
+
+<hr>
+
+<b>🎁 Special Offers</b>
+<div class=offer id=offers></div>
+
+<div style="margin-top:12px"><b>You Pay</b></div>
+<div class=big id=final>₹6,000</div>
+
+<a id=wa class=btn target=_blank>Get Exact Quote</a>
+
+<p class=small>
+Offers cannot be combined. The best applicable offer will be applied.<br>
+Proof may be required to avail promotional offers. Terms &amp; Conditions apply.
+</p>
+</div></div>
+
+<script>
+const pts=[
+{a:1,p:1500},{a:2,p:2000},{a:4,p:3500},{a:6,p:4500},
+{a:8,p:5250},{a:12,p:6000},{a:16,p:9000},{a:20,p:13000},{a:24,p:18000}
+];
+const offers=[
+["No Offer",0],
+["🎂 Birthday (50% OFF)",50],
+["🎉 Anniversary (40% OFF)",40],
+["🥳 Birthday Week (30% OFF)",30],
+["❤️ Couple Tattoo (20% OFF)",20],
+["🎈 Birthday Month (20% OFF)",20],
+["📅 First 10 Days of Month (10% OFF)",10]
+];
+offers.forEach((o,i)=>{
+offersDiv=document.getElementById("offers");
+offersDiv.innerHTML+=`<label><input type="radio" name="off" value="${o[1]}" ${i==0?"checked":""}> ${o[0]}</label>`;
+});
+function interp(a){
+if(a>=24)return null;
+if(a<=1)return 1500;
+for(let i=0;i<pts.length-1;i++){
+let l=pts[i],u=pts[i+1];
+if(a>=l.a&&a<=u.a){
+let t=(a-l.a)/(u.a-l.a);
+return Math.round((l.p+t*(u.p-l.p))/50)*50;
+}}
+}
+function cmp(a){
+if(a<2)return"🪙 About the size of a ₹10 coin";
+if(a<4)return"🔑 About the size of a car key";
+if(a<7)return"💳 About the size of a credit card";
+if(a<10)return"✋ About the size of your palm";
+if(a<13)return"📄 About the size of an A4 sheet folded into quarters";
+if(a<19)return"📱 About the size of a Samsung Z Flip (opened)";
+if(a<24)return"💻 About the size of a laptop screen";
+return"🎨 You've officially graduated from calculators. Let's talk about your tattoo.";
+}
+function update(){
+let wd=+w.value,ht=+h.value;
+wvs.textContent=wd;hvs.textContent=ht;
+let ar=+(wd*ht).toFixed(1);area.textContent=ar;
+compare.textContent=cmp(ar);
+let base=interp(ar);
+let radios=[...document.querySelectorAll('input[name=off]')];
+let r=radios.find(x=>x.checked);
+let disc=+r.value;
+let label=r.parentNode.textContent.trim();
+if(base==null){
+price.textContent="Consultation";
+final.textContent="Consultation";
+}else{
+price.textContent="₹"+base.toLocaleString("en-IN");
+let fp=Math.round(base*(100-disc)/100);
+final.textContent="₹"+fp.toLocaleString("en-IN");
+}
+let est=base==null?"Consultation":"₹"+base.toLocaleString("en-IN");
+let msg=`Hi Dayara Tattoos!
+
+I used the Tattoo Price Estimator.
+
+Size: ${wd}" × ${ht}"
+Area: ${ar} sq in
+Estimated Price: ${est}
+Selected Offer: ${label}
+
+I'd like an exact quote.`;
+wa.href="https://wa.me/917972542394?text="+encodeURIComponent(msg);
+}
+document.addEventListener("change",update);
+w.oninput=update;h.oninput=update;update();
+</script>
+</body></html>
